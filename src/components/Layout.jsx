@@ -176,7 +176,7 @@ export default function Layout({ children }) {
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center p-1">
                     <img
-                      src="/images/logo-koribali.png"
+                      src="/images/koribali-logo.png"
                       alt="Logo"
                       className="object-contain"
                     />
@@ -260,7 +260,7 @@ export default function Layout({ children }) {
           >
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shrink-0 p-1">
               <img
-                src="/images/logo-koribali.png"
+                src="/images/koribali-logo.png"
                 alt="Logo"
                 className="object-contain"
               />

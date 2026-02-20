@@ -61,7 +61,7 @@ export default function LightingPolePages({
               {cover?.date ? formatJP(cover.date) : ""}
             </div>
             <img
-              src="/images/YSpole2.png"
+              src="/images/ys-logo.png"
               alt="logo YS"
               className="mx-auto w-[300px] h-auto"
             />

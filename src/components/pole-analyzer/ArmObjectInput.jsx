@@ -8,19 +8,19 @@ import {
   Circle,
 } from "lucide-react";
 
-export function DirectObjectInput({
-  directObjects = [],
-  doInputValue,
-  setDoInputValue,
+export function ArmObjectInput({
+  armObjects = [],
+  aoInputValue,
+  setAoInputValue,
   onUpdate,
   errors,
-  onAddDo,
-  onCopyDo,
-  onPasteDo,
+  onAddAo,
+  onCopyAo,
+  onPasteAo,
   hasClipboard,
-  setConfirmDeleteDo,
-  resetCurrentDo,
-  handleAddDo,
+  setConfirmDeleteAo,
+  resetCurrentAo,
+  handleAddAo,
 }) {
   // Function to helper class input
   const inputClass = (hasError) =>
@@ -39,15 +39,15 @@ export function DirectObjectInput({
       </div>
     ) : null;
 
-  const doValueNumber = Number(doInputValue);
-  const isDoInputValue =
-    !doInputValue ||
-    isNaN(doInputValue) ||
-    doValueNumber <= 0 ||
-    doValueNumber > 25;
+  const aoValueNumber = Number(aoInputValue);
+  const isAoInputValue =
+    !aoInputValue ||
+    isNaN(aoInputValue) ||
+    aoValueNumber <= 0 ||
+    aoValueNumber > 5;
 
   return (
-    <div className="rounded-b-2xl shadow-sm border border-gray-200 overflow-hidden bg-white hp:rounded-b-xl">
+    <div className="shadow-sm border border-gray-200 overflow-hidden bg-white">
       <div className="px-6 pt-6 pb-3 hp:px-4 hp:pt-4 hp:pb-2">
         <div>
           {/* HEADER DIRECT OBJECT INPUT */}
@@ -56,7 +56,7 @@ export function DirectObjectInput({
               <h2 className="text-[#0d3b66] font-medium text-sm flex items-center gap-1 hp:text-xs">
                 <div className="w-1 h-5 bg-[#3399cc] rounded-full mr-1 hp:h-4"></div>
                 <span className="font-semibold">
-                  Configure up to 25 Direct Objects
+                  Configure up to 5 Arm Objects
                 </span>
                 <span className="hp:hidden">with detailed specifications</span>
               </h2>
@@ -89,10 +89,10 @@ export function DirectObjectInput({
             <input
               type="number"
               min={1}
-              max={25}
+              max={5}
               placeholder="Object Count"
-              value={doInputValue}
-              onChange={(e) => setDoInputValue(e.target.value)}
+              value={aoInputValue}
+              onChange={(e) => setAoInputValue(e.target.value)}
               onWheel={(e) => e.target.blur()}
               className="
                 w-[180px] px-7 py-2.5 text-center text-sm rounded-lg outline-none
@@ -107,8 +107,8 @@ export function DirectObjectInput({
             />
 
             <button
-              onClick={onAddDo}
-              disabled={isDoInputValue}
+              onClick={onAddAo}
+              disabled={isAoInputValue}
               className={`
                 flex items-center gap-2 px-7 py-2.5 text-sm font-medium rounded-lg
                 transition-all shadow-md border
@@ -118,13 +118,13 @@ export function DirectObjectInput({
                 hp:text-xs
 
                 ${
-                  isDoInputValue
+                  isAoInputValue
                     ? "bg-gray-50 border-gray-300 text-gray-600 opacity-40 cursor-not-allowed"
                     : "bg-blue-50 border-blue-500 text-blue-700 hover:bg-blue-100"
                 }
               `}
             >
-              {isDoInputValue ? (
+              {isAoInputValue ? (
                 <Circle className="w-4 h-4 text-gray-400" />
               ) : (
                 <CheckCircle className="w-4 h-4 text-blue-500" />
@@ -146,29 +146,29 @@ export function DirectObjectInput({
             "
           >
             <span className="text-[#0d3b66] font-semibold">
-              {directObjects.length}
+              {armObjects.length}
             </span>
             <span className="text-slate-400">/</span>
-            <span className="text-slate-600">25 Direct Objects</span>
+            <span className="text-slate-600">5 Arm Objects</span>
           </div>
         </div>
       </div>
 
-      {directObjects.length === 0 && (
+      {armObjects.length === 0 && (
         <div className="text-center text-gray-400 text-sm py-6 hp:text-xs hp:py-4">
-          No Direct Object added yet
+          No Arm Object added yet
         </div>
       )}
 
       {/* ACTIVE DO INPUT */}
-      {directObjects.map((directObject, index) => {
-        const doError = errors?.[directObject.idDo] || {};
-        const isLast = index === directObjects.length - 1;
-        const hasMultiple = directObjects.length > 1;
+      {armObjects.map((armObject, index) => {
+        const aoError = errors?.[armObject.idAo] || {};
+        const isLast = index === armObjects.length - 1;
+        const hasMultiple = armObjects.length > 1;
 
         return (
           <div
-            key={directObject.idDo}
+            key={armObject.idAo}
             className={`hover:bg-blue-50 p-6 
             ${hasMultiple && !isLast ? "border-b border-gray-200" : ""} hp:px-4 hp:pb-6 hp:pt-4`}
           >
@@ -195,11 +195,11 @@ export function DirectObjectInput({
 
                 <div>
                   <h4 className="text-base text-[#0d3b66] text-sm font-medium leading-snug hp:text-xs">
-                    Direct Object
-                    {directObject.nameDo && ` : ${directObject.nameDo}`}
+                    Arm Object
+                    {armObject.nameAo && ` : ${armObject.nameAo}`}
                   </h4>
                   <p className="text-xs text-gray-500 hp:text-[10px]">
-                    {directObject.typeOfDo} Type
+                    {armObject.typeOfAo} Type
                   </p>
                 </div>
               </div>
@@ -209,20 +209,20 @@ export function DirectObjectInput({
                 {/* COPY / PASTE */}
                 <div className="flex items-center gap-2 ml-2">
                   <button
-                    onClick={() => onCopyDo(directObject)}
-                    title="Copy this Direct Object"
+                    onClick={() => onCopyAo(armObject)}
+                    title="Copy this Arm Object"
                     className="p-2 rounded-md border bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
                   >
                     <Copy className="w-4 h-4" />
                   </button>
 
                   <button
-                    onClick={() => onPasteDo(directObject.idDo)}
+                    onClick={() => onPasteAo(armObject.idAo)}
                     disabled={!hasClipboard}
                     title={
                       hasClipboard
-                        ? "Paste copied Direct Object"
-                        : "No copied Direct Object"
+                        ? "Paste copied Arm Object"
+                        : "No copied Arm Object"
                     }
                     className={`p-2 rounded-md border transition ${
                       hasClipboard
@@ -239,7 +239,7 @@ export function DirectObjectInput({
 
                 {/* RESET */}
                 <button
-                  onClick={() => resetCurrentDo(directObject.idDo)}
+                  onClick={() => resetCurrentAo(armObject.idAo)}
                   className="flex items-center gap-2 px-5 py-2 h-[40px] bg-[#eef2f6] text-[#0d3b66] border border-[#d0d7e2] rounded-lg hover:bg-[#e2e8f0] transition text-xs font-medium"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -250,7 +250,7 @@ export function DirectObjectInput({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setConfirmDeleteDo(directObject.idDo);
+                    setConfirmDeleteAo(armObject.idAo);
                   }}
                   className="flex items-center gap-2 px-4 py-2 h-[40px] rounded-lg border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 transition text-xs font-medium"
                 >
@@ -264,7 +264,7 @@ export function DirectObjectInput({
                 {/* LEFT: COPY / PASTE */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => onCopyDo(directObject)}
+                    onClick={() => onCopyAo(armObject)}
                     title="Copy"
                     className="h-8 w-8 rounded-md border bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center justify-center"
                   >
@@ -272,7 +272,7 @@ export function DirectObjectInput({
                   </button>
 
                   <button
-                    onClick={() => onPasteDo(directObject.idDo)}
+                    onClick={() => onPasteAo(armObject.idAo)}
                     disabled={!hasClipboard}
                     title="Paste"
                     className={`h-8 w-8 rounded-md border transition flex items-center justify-center ${
@@ -288,7 +288,7 @@ export function DirectObjectInput({
                 {/* RIGHT: RESET / DELETE */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => resetCurrentDo(directObject.idDo)}
+                    onClick={() => resetCurrentAo(armObject.idAo)}
                     title="Reset"
                     className="h-8 w-8 rounded-md border bg-[#eef2f6] text-[#0d3b66] hover:bg-[#e2e8f0] transition flex items-center justify-center"
                   >
@@ -298,7 +298,7 @@ export function DirectObjectInput({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setConfirmDeleteDo(directObject.idDo);
+                      setConfirmDeleteAo(armObject.idAo);
                     }}
                     title="Delete"
                     className="h-8 w-8 rounded-md border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 transition flex items-center justify-center"
@@ -322,42 +322,42 @@ export function DirectObjectInput({
                   hp:gap-y-6
                 "
               >
-                {/* Direct Object Name Input */}
+                {/* Arm Object Name Input */}
                 <div className="relative w-[200px] hp:w-full hp:col-span-2">
                   <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
                     Object Name
                   </label>
                   <input
                     type="text"
-                    value={directObject.nameDo}
+                    value={armObject.nameAo}
                     onChange={(e) =>
-                      onUpdate(directObject.idDo, { nameDo: e.target.value })
+                      onUpdate(armObject.idAo, { nameAo: e.target.value })
                     }
-                    placeholder="e.g., 灯具"
-                    className={inputClass(doError.nameDo)}
+                    placeholder="e.g., 感知器"
+                    className={inputClass(aoError.nameAo)}
                   />
-                  <ErrorText show={doError.nameDo} text="Required field" />
+                  <ErrorText show={aoError.nameAo} text="Required field" />
                 </div>
 
-                {/* Type of Direct Object Selector */}
+                {/* Type of Arm Object Selector */}
                 <div className="relative w-[140px] hp:w-full">
                   <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
-                    Type of DO
+                    Type
                   </label>
                   <select
-                    value={directObject.typeOfDo}
+                    value={armObject.typeOfAo}
                     onChange={(e) =>
-                      onUpdate(directObject.idDo, { typeOfDo: e.target.value })
+                      onUpdate(armObject.idAo, { typeOfAo: e.target.value })
                     }
-                    className={inputClass(doError.typeOfDo)}
+                    className={inputClass(aoError.typeOfAo)}
                   >
                     <option value="omni">Omni</option>
                     <option value="directional">Directional</option>
                   </select>
-                  <ErrorText show={doError.typeOfDo} text="Required field" />
+                  <ErrorText show={aoError.typeOfAo} text="Required field" />
                 </div>
 
-                {/* Front Area Direct Object Input */}
+                {/* Front Area Arm Object Input */}
                 <div className="relative w-[140px] hp:w-full">
                   <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
                     Front Area
@@ -365,24 +365,24 @@ export function DirectObjectInput({
                   <div className="relative">
                     <input
                       type="number"
-                      value={directObject.frontAreaDo}
+                      value={armObject.frontAreaAo}
                       onChange={(e) =>
-                        onUpdate(directObject.idDo, {
-                          frontAreaDo: e.target.value,
+                        onUpdate(armObject.idAo, {
+                          frontAreaAo: e.target.value,
                         })
                       }
                       onWheel={(e) => e.target.blur()}
-                      className={`${inputClass(doError.frontAreaDo)} pr-6 hp:py-[9.5px] hp:pr-6`}
+                      className={`${inputClass(aoError.frontAreaAo)} pr-6 hp:py-[9.5px] hp:pr-6`}
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
                       m<sup>2</sup>
                     </span>
                   </div>
-                  <ErrorText show={doError.frontAreaDo} text="Required field" />
+                  <ErrorText show={aoError.frontAreaAo} text="Required field" />
                 </div>
 
-                {/* Side Area Direct Object Input */}
-                {directObject.typeOfDo === "directional" && (
+                {/* Side Area Arm Object Input */}
+                {armObject.typeOfAo === "directional" && (
                   <div className="relative w-[140px] hp:w-full">
                     <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
                       Side Area
@@ -390,27 +390,27 @@ export function DirectObjectInput({
                     <div className="relative">
                       <input
                         type="number"
-                        value={directObject.sideAreaDo}
+                        value={armObject.sideAreaAo}
                         onChange={(e) =>
-                          onUpdate(directObject.idDo, {
-                            sideAreaDo: e.target.value,
+                          onUpdate(armObject.idAo, {
+                            sideAreaAo: e.target.value,
                           })
                         }
                         onWheel={(e) => e.target.blur()}
-                        className={`${inputClass(doError.sideAreaDo)} pr-6 hp:pr-6`}
+                        className={`${inputClass(aoError.sideAreaAo)} pr-6 hp:pr-6`}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
                         m<sup>2</sup>
                       </span>
                     </div>
                     <ErrorText
-                      show={doError.sideAreaDo}
+                      show={aoError.sideAreaAo}
                       text="Required field"
                     />
                   </div>
                 )}
 
-                {/* Weight Direct Object Input */}
+                {/* Weight Arm Object Input */}
                 <div className="relative w-[140px] hp:w-full">
                   <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
                     Weight
@@ -418,87 +418,48 @@ export function DirectObjectInput({
                   <div className="relative">
                     <input
                       type="number"
-                      value={directObject.weightDo}
+                      value={armObject.weightAo}
                       onChange={(e) =>
-                        onUpdate(directObject.idDo, {
-                          weightDo: e.target.value,
+                        onUpdate(armObject.idAo, {
+                          weightAo: e.target.value,
                         })
                       }
                       onWheel={(e) => e.target.blur()}
-                      className={`${inputClass(doError.weightDo)} pr-6 hp:pr-6`}
+                      className={`${inputClass(aoError.weightAo)} pr-6 hp:pr-6`}
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
                       kg
                     </span>
                   </div>
-                  <ErrorText show={doError.weightDo} text="Required field" />
+                  <ErrorText show={aoError.weightAo} text="Required field" />
                 </div>
 
-                {/* Z (Height) Direct Object Input */}
+                {/* H-distance Arm Object Input */}
                 <div className="relative w-[140px] hp:w-full">
                   <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
-                    Z (Height)
+                    H-distance
                   </label>
                   <div className="relative">
                     <input
                       type="number"
-                      value={directObject.heightDo}
+                      value={armObject.heightAo}
                       onChange={(e) =>
-                        onUpdate(directObject.idDo, {
-                          heightDo: e.target.value,
+                        onUpdate(armObject.idAo, {
+                          heightAo: e.target.value,
                         })
                       }
                       onWheel={(e) => e.target.blur()}
-                      className={`${inputClass(doError.heightDo)} pr-8 hp:pr-8`}
+                      className={`${inputClass(aoError.heightAo)} pr-8 hp:pr-8`}
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
                       mm
                     </span>
                   </div>
-                  <ErrorText show={doError.heightDo} text="Required field" />
+                  <ErrorText show={aoError.heightAo} text="Required field" />
                 </div>
 
-                {/* nnC Direct Object Input */}
-                <div className="relative w-[140px] hp:w-full">
-                  <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
-                    nnC
-                  </label>
-                  <input
-                    type="number"
-                    value={directObject.nncDo}
-                    onChange={(e) =>
-                      onUpdate(directObject.idDo, { nncDo: e.target.value })
-                    }
-                    onWheel={(e) => e.target.blur()}
-                    className={inputClass(doError.nncDo)}
-                  />
-                  <ErrorText show={doError.nncDo} text="Required field" />
-                </div>
-
-                {/* Quantity Direct Object Input */}
-                <div className="relative w-[100px] hp:w-full">
-                  <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
-                    Quantity
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={directObject.qtyDo}
-                      onChange={(e) =>
-                        onUpdate(directObject.idDo, { qtyDo: e.target.value })
-                      }
-                      onWheel={(e) => e.target.blur()}
-                      className={`${inputClass(doError.qtyDo)} pr-8 hp:pr-8`}
-                    />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
-                      pcs
-                    </span>
-                  </div>
-                  <ErrorText show={doError.qtyDo} text="Required field" />
-                </div>
-
-                {/* Fix Angle Direct Object Input */}
-                {directObject.typeOfDo === "directional" && (
+                {/* Fix Angle Arm Object Input */}
+                {armObject.typeOfAo === "directional" && (
                   <div className="relative w-[140px] hp:w-full">
                     <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
                       Fix Angle
@@ -506,25 +467,64 @@ export function DirectObjectInput({
                     <div className="relative">
                       <input
                         type="number"
-                        value={directObject.fixAngleDo}
+                        value={armObject.fixAngleAo}
                         onChange={(e) =>
-                          onUpdate(directObject.idDo, {
-                            fixAngleDo: e.target.value,
+                          onUpdate(armObject.idAo, {
+                            fixAngleAo: e.target.value,
                           })
                         }
                         onWheel={(e) => e.target.blur()}
-                        className={`${inputClass(doError.fixAngleDo)} pr-8 hp:pr-8`}
+                        className={`${inputClass(aoError.fixAngleAo)} pr-8 hp:pr-8`}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
                         deg
                       </span>
                     </div>
                     <ErrorText
-                      show={doError.fixAngleDo}
+                      show={aoError.fixAngleAo}
                       text="Required field"
                     />
                   </div>
                 )}
+
+                {/* nnC Arm Object Input */}
+                <div className="relative w-[140px] hp:w-full">
+                  <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
+                    nnC
+                  </label>
+                  <input
+                    type="number"
+                    value={armObject.nncAo}
+                    onChange={(e) =>
+                      onUpdate(armObject.idAo, { nncAo: e.target.value })
+                    }
+                    onWheel={(e) => e.target.blur()}
+                    className={inputClass(aoError.nncAo)}
+                  />
+                  <ErrorText show={aoError.nncAo} text="Required field" />
+                </div>
+
+                {/* Quantity Arm Object Input */}
+                <div className="relative w-[100px] hp:w-full">
+                  <label className="block text-sm text-gray-700 mb-2 hp:text-xs hp:mb-1">
+                    Quantity
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={armObject.qtyAo}
+                      onChange={(e) =>
+                        onUpdate(armObject.idAo, { qtyAo: e.target.value })
+                      }
+                      onWheel={(e) => e.target.blur()}
+                      className={`${inputClass(aoError.qtyAo)} pr-8 hp:pr-8`}
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-black-400">
+                      pcs
+                    </span>
+                  </div>
+                  <ErrorText show={aoError.qtyAo} text="Required field" />
+                </div>
               </div>
             </div>
           </div>
@@ -537,15 +537,15 @@ export function DirectObjectInput({
       <div className="flex justify-center items-center p-6 hp:p-4">
         {/* Add Button */}
         <button
-          onClick={handleAddDo}
-          disabled={directObjects.length >= 25}
+          onClick={handleAddAo}
+          disabled={armObjects.length >= 5}
           className={`
             w-full py-2.5 font-medium text-sm rounded-lg
             flex items-center justify-center gap-2
             transition-all duration-200
 
             ${
-              directObjects.length >= 25
+              armObjects.length >= 5
                 ? "border-2 border-dashed border-gray-300 text-gray-400 cursor-not-allowed opacity-50"
                 : "border-2 border-dashed border-[#3399cc] text-[#3399cc] bg-transparent hover:bg-[#3399cc] hover:text-white"
             }

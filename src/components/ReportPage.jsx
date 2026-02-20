@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LightingPoleReport from "./report/lightingpole/LightingPoleReport";
 import AcemastReport from "./report/acemast/AcemastReport";
+import SignboardReport from "./report/signboard/SignboardReport";
 import {
   ArrowLeft,
   Download,
@@ -74,6 +75,19 @@ export function ReportPage() {
         return (
           <div id="report-a4">
             <AcemastReport
+              cover={cover}
+              condition={condition}
+              structuralDesign={structuralDesign}
+              results={results}
+              resultsDo={resultsDo}
+              resultsOhw={resultsOhw}
+            />
+          </div>
+        );
+      case "signboard":
+        return (
+          <div id="report-a4">
+            <SignboardReport
               cover={cover}
               condition={condition}
               structuralDesign={structuralDesign}

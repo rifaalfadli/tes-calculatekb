@@ -616,6 +616,290 @@ export const ConfirmReduceOhwModal = ({
 };
 
 // ====================================================
+// DELETE ARM CONFIRMATION MODAL
+// ====================================================
+export const ConfirmDeleteArmModal = ({
+  confirmDeleteArm,
+  onClose,
+  handleRemoveArm,
+}) => {
+  if (!confirmDeleteArm) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+      <div
+        className="
+          w-full max-w-xs
+          bg-white border border-gray-200
+          rounded-xl shadow-xl
+          p-4
+          sm:max-w-md sm:p-8 sm:rounded-2xl
+        "
+      >
+        {/* Icon */}
+        <div
+          className="
+            mx-auto mb-3
+            flex items-center justify-center
+            w-10 h-10 sm:w-16 sm:h-16
+            bg-red-100 rounded-full
+          "
+        >
+          <AlertCircle className="w-5 h-5 sm:w-8 sm:h-8 text-red-500" />
+        </div>
+
+        {/* Title */}
+        <h2
+          className="
+            text-center font-bold
+            text-sm sm:text-base
+            text-gray-900
+            mb-1 sm:mb-2
+          "
+        >
+          Delete Arm?
+        </h2>
+
+        {/* Description */}
+        <p
+          className="
+            text-center text-gray-600
+            text-xs sm:text-sm
+            mb-4 sm:mb-6
+            leading-relaxed
+          "
+        >
+          Are you sure you want to delete this arm? This action cannot be
+          undone.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={onClose}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-slate-100 text-slate-600
+              rounded-md sm:rounded-lg
+              hover:bg-slate-200 transition
+            "
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={() => {
+              handleRemoveArm();
+              onClose();
+            }}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-red-500 text-white
+              rounded-md sm:rounded-lg
+              hover:bg-red-600 transition
+            "
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ====================================================
+// DELETE ARM OBJECT CONFIRMATION MODAL
+// ====================================================
+export const ConfirmDeleteAoModal = ({
+  confirmDelete,
+  onClose,
+  handleRemoveAo,
+}) => {
+  if (!confirmDelete) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+      <div
+        className="
+          w-full max-w-xs
+          bg-white border border-gray-200
+          rounded-xl shadow-xl
+          p-4
+          sm:max-w-md sm:p-8 sm:rounded-2xl
+        "
+      >
+        {/* Icon */}
+        <div
+          className="
+            mx-auto mb-3
+            flex items-center justify-center
+            w-10 h-10 sm:w-16 sm:h-16
+            bg-red-100 rounded-full
+          "
+        >
+          <AlertCircle className="w-5 h-5 sm:w-8 sm:h-8 text-red-500" />
+        </div>
+
+        {/* Title */}
+        <h2
+          className="
+            text-center font-bold
+            text-sm sm:text-base
+            text-gray-900
+            mb-1 sm:mb-2
+          "
+        >
+          Delete Object?
+        </h2>
+
+        {/* Description */}
+        <p
+          className="
+            text-center text-gray-600
+            text-xs sm:text-sm
+            mb-4 sm:mb-6
+            leading-relaxed
+          "
+        >
+          Are you sure you want to delete this object? This action cannot be
+          undone.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={onClose}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-slate-100 text-slate-600
+              rounded-md sm:rounded-lg
+              hover:bg-slate-200 transition
+            "
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={() => {
+              handleRemoveAo();
+              onClose();
+            }}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-red-500 text-white
+              rounded-md sm:rounded-lg
+              hover:bg-red-600 transition
+            "
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ====================================================
+// REDUCE ARM OBJECT CONFIRMATION MODAL
+// ====================================================
+export const ConfirmReduceAoModal = ({
+  confirmReduceAo,
+  cancelReduceArmObjects,
+  confirmReduceArmObjects,
+}) => {
+  if (!confirmReduceAo) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+      <div
+        className="
+          w-full max-w-xs
+          bg-white border border-gray-200
+          rounded-xl shadow-xl
+          p-4
+          sm:max-w-md sm:p-8 sm:rounded-2xl
+        "
+      >
+        {/* Icon */}
+        <div
+          className="
+            mx-auto mb-3
+            flex items-center justify-center
+            w-10 h-10 sm:w-16 sm:h-16
+            bg-red-100 rounded-full
+          "
+        >
+          <AlertCircle className="w-5 h-5 sm:w-8 sm:h-8 text-red-500" />
+        </div>
+
+        {/* Title */}
+        <h2
+          className="
+            text-center font-bold
+            text-sm sm:text-base
+            text-gray-900
+            mb-1 sm:mb-2
+          "
+        >
+          Reduce Arm Objects?
+        </h2>
+
+        {/* Description */}
+        <p
+          className="
+            text-center text-gray-600
+            text-xs sm:text-sm
+            mb-4 sm:mb-6
+            leading-relaxed
+          "
+        >
+          You are about to reduce Arm Objects from{" "}
+          <strong>{confirmReduceAo.from}</strong> to{" "}
+          <strong>{confirmReduceAo.to}</strong>. The last objects will be
+          permanently removed.
+        </p>
+
+        {/* Buttons */}
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={cancelReduceArmObjects}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-slate-100 text-slate-600
+              rounded-md sm:rounded-lg
+              hover:bg-slate-200 transition
+            "
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={confirmReduceArmObjects}
+            className="
+              flex-1
+              py-2 sm:py-3 font-bold
+              text-xs sm:text-sm
+              bg-red-500 text-white
+              rounded-md sm:rounded-lg
+              hover:bg-red-600 transition
+            "
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ====================================================
 // TOAST MODAL
 // ====================================================
 export const ToastModal = ({ toast, onClose }) => {

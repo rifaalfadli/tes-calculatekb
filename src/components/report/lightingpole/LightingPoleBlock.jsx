@@ -18,7 +18,7 @@ export const createBlocks = (
     blocks.push({
       id: `c1-${suffix}`,
       node: (
-        <section>
+        <section className="pt-[20px]">
           {/* Main-section: (Consideration of pillars) + material specifications */}
           <h2 className="page1-title">
             <span className="page1-number">{3 + sectionCounter++}.</span>
@@ -37,7 +37,7 @@ export const createBlocks = (
             </span>
           </h2>
 
-          <div className="flex flex-col mb-[20px]">
+          <div className="flex flex-col">
             {/* Sub-section: 1) 荷重計算 (Load calculation) */}
             <div className="flex justify-start ml-[22px] mb-0">
               <span className="page1-number">1).</span>
@@ -186,9 +186,9 @@ export const createBlocks = (
     blocks.push({
       id: `c2-${suffix}`,
       node: (
-        <section>
+        <section className="pt-[20px]">
           {/* Sub-section: 2) 風時曲げモーメント (Bending Moment due to Wind) */}
-          <div className="flex flex-col mb-[20px]">
+          <div className="flex flex-col">
             <div className="flex justify-start ml-[22px] mb-0">
               <span className="page1-number">2).</span>
               <span className="page1-text tracking-[0.1em] jp">
@@ -211,9 +211,9 @@ export const createBlocks = (
     blocks.push({
       id: `c3-${suffix}`,
       node: (
-        <section>
+        <section className="pt-[20px]">
           {/* Sub-section: 3) 曲げ応力度 (Bending Stress) */}
-          <div className="flex flex-col mb-[20px]">
+          <div className="flex flex-col">
             <div className="flex justify-start ml-[22px] mb-0">
               <span className="page1-number">3).</span>
               <span className="page1-text tracking-[0.1em] jp">曲げ応力度</span>
@@ -265,7 +265,7 @@ export const createBlocks = (
   blocks.push({
     id: "c4",
     node: (
-      <section>
+      <section className="pt-[20px]">
         {/* Main-section: 基礎部に加わる応力 (Stress applied to the foundation) */}
         <h2 className="page1-title">
           <span className="page1-number">{3 + sectionCounter++}.</span>

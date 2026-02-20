@@ -9,6 +9,8 @@ import { PoleInput } from "./pole-analyzer/PoleInput";
 import { DirectObjectInput } from "./pole-analyzer/DirectObjectInput";
 import { OverheadWireInput } from "./pole-analyzer/OverheadWireInput";
 import { ResultsTable } from "./pole-analyzer/ResultsTable";
+import { ArmObjectInput } from "./pole-analyzer/ArmObjectInput";
+import { ArmInput } from "./pole-analyzer/ArmInput";
 
 // UTILS & MODALS: Shared logic and overlays
 import * as Modal from "./pole-analyzer/PoleAnalyzerModal";
@@ -105,6 +107,20 @@ export function PoleStructuralAnalyzer() {
   });
   const [ohwErrors, setOhwErrors] = useState({});
 
+  // STATE: Arm input
+  const [arms, setArms] = useState(() => {
+    const saved = sessionStorage.getItem("arms");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [armsErrors, setArmsErrors] = useState({});
+
+  // STATE: Arm Object input
+  // const [armObjects, setArmObjects] = useState(() => {
+  //   const saved = sessionStorage.getItem("armObjects");
+  //   return saved ? JSON.parse(saved) : [];
+  // });
+  const [aoErrors, setAoErrors] = useState({});
+
   // STATE: Results all structural design
   const [, setResultStructuralDesign] = useState(() => {
     const saved = sessionStorage.getItem("resultStructuralDesign");
@@ -123,9 +139,21 @@ export function PoleStructuralAnalyzer() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // STATE: Results all direct object
+  // STATE: Results all overhead wire
   const [resultsOhw, setResultsOhw] = useState(() => {
     const saved = sessionStorage.getItem("resultsOhw");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // STATE: Results all arm
+  const [resultsArm, setResultsArm] = useState(() => {
+    const saved = sessionStorage.getItem("resultsArm");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // STATE: Results all arm object
+  const [resultsAo, setResultsAo] = useState(() => {
+    const saved = sessionStorage.getItem("resultsAo");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -173,6 +201,16 @@ export function PoleStructuralAnalyzer() {
     sessionStorage.setItem("overheadWires", JSON.stringify(overheadWires));
   }, [overheadWires]);
 
+  // PERSISTENCE: Arm Input
+  useEffect(() => {
+    sessionStorage.setItem("arms", JSON.stringify(arms));
+  }, [arms]);
+
+  // // PERSISTENCE: Arm Object input
+  // useEffect(() => {
+  //   sessionStorage.setItem("armObjects", JSON.stringify(armObjects));
+  // }, [armObjects]);
+
   // PERSISTENCE: Results all step pole
   useEffect(() => {
     sessionStorage.setItem("results", JSON.stringify(results));
@@ -187,6 +225,16 @@ export function PoleStructuralAnalyzer() {
   useEffect(() => {
     sessionStorage.setItem("resultsOhw", JSON.stringify(resultsOhw));
   }, [resultsOhw]);
+
+  // PERSISTENCE: Results all arm
+  useEffect(() => {
+    sessionStorage.setItem("resultsArm", JSON.stringify(resultsArm));
+  }, [resultsArm]);
+
+  // PERSISTENCE: Results all arm object
+  useEffect(() => {
+    sessionStorage.setItem("resultsAo", JSON.stringify(resultsAo));
+  }, [resultsAo]);
 
   // PERSISTENCE: Results table
   useEffect(() => {
@@ -210,6 +258,10 @@ export function PoleStructuralAnalyzer() {
   //
   // --- Step Pole Controls ---
   const [confirmDelete, setConfirmDelete] = useState(null); // section deletion confirmation
+  const [activeTab, setActiveTab] = useState("1"); // currently active section
+  const activeSection = sections.find((s) => s.id === activeTab);
+  const isLastSection = sections[sections.length - 1]?.id === activeTab;
+  const isOnlySection = sections.length === 1;
 
   // --- Direct Object (DO) Controls ---
   const [confirmReduceDo, setConfirmReduceDo] = useState(null);
@@ -223,8 +275,29 @@ export function PoleStructuralAnalyzer() {
   const [ohwInputValue, setOhwInputValue] = useState("");
   const [confirmDeleteOhw, setConfirmDeleteOhw] = useState(null);
 
+  // --- Step Arm Controls ---
+  const [confirmDeleteArm, setConfirmDeleteArm] = useState(null); // arm deletion confirmation
+  const [activeTabArm, setActiveTabArm] = useState("1"); // currently active section
+  const activeArm = arms.find((s) => s.idArm === activeTabArm);
+  const armObjects = activeArm?.armObjects || [];
+
+  const setArmObjects = (newObjects) => {
+    setArms((prev) =>
+      prev.map((arm) =>
+        arm.idArm === activeTabArm ? { ...arm, armObjects: newObjects } : arm,
+      ),
+    );
+  };
+  const isLastArm = arms[arms.length - 1]?.idArm === activeTabArm;
+  const isOnlyArm = arms.length === 1;
+
+  // --- Arm Object (AO) Controls ---
+  const [confirmReduceAo, setConfirmReduceAo] = useState(null);
+  const [aoClipboard, setAoClipboard] = useState(null);
+  const [aoInputValue, setAoInputValue] = useState("");
+  const [confirmDeleteAo, setConfirmDeleteAo] = useState(null);
+
   // --- Global UI & Navigation ---
-  const [activeTab, setActiveTab] = useState("1"); // currently active section
   const [toast, setToast] = useState(null); // toast notifications { message, type }
   const [showCoverPopup, setShowCoverPopup] = useState(false); // show cover popup
   const [confirmResetAll, setConfirmResetAll] = useState(false); // reset all confirmation
@@ -234,11 +307,8 @@ export function PoleStructuralAnalyzer() {
   const [isExpandedCondition, setIsExpandedCondition] = useState(true); // expand/collapse condition input
   const [isExpandedDo, setIsExpandedDo] = useState(false); // expand/collapse direct object input
   const [isExpandedOhw, setIsExpandedOhw] = useState(false); // expand/collapse overhead wire input
-
-  // Active section variable, check whether it is the last or the only one.
-  const activeSection = sections.find((s) => s.id === activeTab);
-  const isLastSection = sections[sections.length - 1]?.id === activeTab;
-  const isOnlySection = sections.length === 1;
+  const [isExpandedArm, setIsExpandedArm] = useState(true); // expand/collapse arm input
+  const [isExpandedAo, setIsExpandedAo] = useState(false); // expand/collapse arm object input
 
   //
   // ==========================================================================
@@ -282,7 +352,39 @@ export function PoleStructuralAnalyzer() {
     }
   }, []);
 
-  // --- UI Guard: Ensure Active Tab always points to a valid section ---
+  // --- ID Recovery: Sync Refs with Session Storage to prevent ID conflict ---
+  // Generates unique Arm IDs and syncs with sessionStorage on mount
+  const armIdRef = useRef(1);
+  useEffect(() => {
+    const saved = sessionStorage.getItem("arms");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) {
+        armIdRef.current = Math.max(...parsed.map((s) => Number(s.idArm)));
+      }
+    }
+  }, []);
+
+  // Generates unique Arm Object IDs and syncs with sessionStorage on mount
+  const aoIdRef = useRef(1);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("arms");
+
+    if (!saved) return;
+
+    const parsed = JSON.parse(saved);
+
+    const allAoIds = parsed.flatMap(
+      (arm) => arm.armObjects?.map((o) => Number(o.idAo)) || [],
+    );
+
+    if (allAoIds.length > 0) {
+      aoIdRef.current = Math.max(...allAoIds);
+    }
+  }, []);
+
+  // --- UI Guard: Ensure Active Tab always points to a valid pole ---
   useEffect(() => {
     if (sections.length === 0) return;
     const isActiveValid = sections.some((s) => s.id === activeTab);
@@ -290,6 +392,15 @@ export function PoleStructuralAnalyzer() {
       setActiveTab(sections[0].id);
     }
   }, [sections, activeTab]);
+
+  // --- UI Guard: Ensure Active Tab always points to a valid arm ---
+  useEffect(() => {
+    if (arms.length === 0) return;
+    const isActiveValidArm = arms.some((s) => s.idArm === activeTabArm);
+    if (!isActiveValidArm) {
+      setActiveTabArm(arms[0].idArm);
+    }
+  }, [arms, activeTabArm]);
 
   //
   // ==========================================================================
@@ -514,6 +625,109 @@ export function PoleStructuralAnalyzer() {
     return Utils.isOhwComplete(overheadWire);
   };
 
+  // ------------------------ Function for ArmInput ------------------------
+  // FUNCTION: Add a new arm (max 6 Arm)
+  const handleAddArm = () => {
+    Utils.addArm(arms, setArms, setActiveTabArm, armIdRef);
+  };
+
+  // FUNCTION: Remove a arm by ID
+  const handleRemoveArm = (idArm) => {
+    Utils.removeArm(idArm, setArms, activeTabArm, setActiveTabArm);
+  };
+
+  // FUNCTION: Update a specific arm's data
+  const handleUpdateArm = (idArm, updates) => {
+    Utils.updateArm(idArm, updates, setArms, arms);
+    Utils.clearArmError(idArm, updates, setArmsErrors);
+  };
+
+  // FUNCTION: Reset the active arm to default values
+  const resetCurrentArm = () => {
+    Utils.resetCurrentArm(setArms, arms, activeTabArm);
+  };
+
+  // FUNCTION: Go to the next arm tab
+  const handleNextArm = () => {
+    Utils.goToNextArm(arms, activeTabArm, setActiveTabArm);
+  };
+
+  // FUNCTION: Check if a arm is complete
+  const handleIsArmComplete = (arm) => {
+    return Utils.isArmComplete(arm);
+  };
+
+  // ------------------------ Function for ArmObjectInput ------------------------
+  const updateActiveArmObjects = (newObjects) => {
+    setArms((prev) =>
+      prev.map((arm) =>
+        arm.idArm === activeTabArm ? { ...arm, armObjects: newObjects } : arm,
+      ),
+    );
+  };
+
+  // FUNCTION: Add a new object (max 5 object) by Input
+  const handleAddAoByInput = () => {
+    Utils.syncAoByInput(
+      aoInputValue,
+      armObjects,
+      updateActiveArmObjects,
+      aoIdRef,
+      setConfirmReduceAo,
+    );
+
+    // reset input setelah reduce
+    setAoInputValue("");
+  };
+
+  // FUNCTION: Confirm reduce Arm Object
+  const confirmReduceArmObjects = () => {
+    const reduced = armObjects.slice(0, confirmReduceAo.to);
+    updateActiveArmObjects(reduced);
+  };
+
+  // FUNCTION: Cancel reduce Arm Object
+  const cancelReduceArmObjects = () => {
+    setAoInputValue(armObjects.length.toString());
+    setConfirmReduceAo(null);
+  };
+
+  // FUNCTION: Add a new object (max 5 object) by click
+  const handleAddAo = () => {
+    Utils.addAo(armObjects, updateActiveArmObjects, aoIdRef);
+  };
+
+  // FUNCTION: Copy Arm Object data into clipboard
+  const handleCopyAo = (armObject) => {
+    Utils.copyAo(armObject, setAoClipboard);
+  };
+
+  // FUNCTION: Paste clipboard data into selected Arm Object
+  const handlePasteAo = (idAo) => {
+    Utils.pasteAo(idAo, updateActiveArmObjects, aoClipboard);
+  };
+
+  // FUNCTION: Remove a object by ID
+  const handleRemoveAo = (idAo) => {
+    Utils.removeAo(idAo, armObjects, updateActiveArmObjects);
+  };
+
+  // FUNCTION: Update a specific object's data
+  const handleUpdateAo = (idAo, updates) => {
+    Utils.updateAo(idAo, updates, armObjects, updateActiveArmObjects);
+    Utils.clearAoError(idAo, updates, setAoErrors);
+  };
+
+  // FUNCTION: Reset the active arm object to default values
+  const handleResetCurrentAo = (idAo) => {
+    Utils.resetCurrentAo(updateActiveArmObjects, armObjects, idAo);
+  };
+
+  // FUNCTION: Check if a arm object is complete
+  const handleIsAoComplete = (armObject) => {
+    return Utils.isAoComplete(armObject);
+  };
+
   // ------------------------ Function for All Form ------------------------
   // FUNCTION: Perform calculation for all form
   const calculateResults = () => {
@@ -528,10 +742,15 @@ export function PoleStructuralAnalyzer() {
       handleIsDoComplete,
       overheadWires,
       handleIsOhwComplete,
+      arms,
+      handleIsArmComplete,
+      handleIsAoComplete,
       setResults,
       setResultStructuralDesign,
       setResultsDo,
       setResultsOhw,
+      setResultsArm,
+      setResultsAo,
       setShowResults,
     );
 
@@ -562,6 +781,16 @@ export function PoleStructuralAnalyzer() {
       setOhwErrors(Utils.getOhwErrors(overheadWires));
     }
 
+    // Identify and display missing or invalid data in arms
+    if (errors.arm) {
+      setArmsErrors(Utils.getArmsErrors(arms));
+    }
+
+    // Validation check for equipment loads (AO) mounted on the pole
+    if (errors.armObject) {
+      setAoErrors(Utils.getAoErrors(arms));
+    }
+
     if (!isValid) return;
 
     // go to results table
@@ -579,10 +808,13 @@ export function PoleStructuralAnalyzer() {
       handleStructuralDesignComplete,
       sections,
       handleIsSectionComplete,
+      arms,
+      handleIsArmComplete,
       directObjects,
       handleIsDoComplete,
       overheadWires,
       handleIsOhwComplete,
+      handleIsAoComplete,
     );
 
     // Validate report cover details (project name, marks, and dates)
@@ -613,6 +845,17 @@ export function PoleStructuralAnalyzer() {
     if (errors.overheadWire) setOhwErrors(Utils.getOhwErrors(overheadWires));
     else setOhwErrors({});
 
+    // Check all arm dimensions and material specifications
+    if (errors.arm) setArmsErrors(Utils.getArmsErrors(arms));
+    else setArmsErrors({});
+
+    // Ensure all mounted equipment (AO) data is valid for the final report
+    if (errors.armObject) {
+      setAoErrors(Utils.getAoErrors(arms));
+    } else {
+      setAoErrors({});
+    }
+
     if (!isValid) return;
 
     sessionStorage.setItem("hasReport", "true");
@@ -622,6 +865,8 @@ export function PoleStructuralAnalyzer() {
         results,
         resultsDo,
         resultsOhw,
+        resultsArm,
+        resultsAo,
         cover,
         condition,
         structuralDesign,
@@ -636,6 +881,8 @@ export function PoleStructuralAnalyzer() {
       setResultsDo,
       setResultsOhw,
       setResultStructuralDesign,
+      setResultsArm,
+      setResultsAo,
       setShowResults,
       setCover,
       setCondition,
@@ -643,14 +890,17 @@ export function PoleStructuralAnalyzer() {
       setSections,
       setDirectObjects,
       setOverheadWires,
+      setArms,
       setActiveTab,
       setIsExpandedCondition,
       setIsExpandedPole,
       sectionIdRef,
       doIdRef,
       ohwIdRef,
+      armIdRef,
       setIsExpandedDo,
       setIsExpandedOhw,
+      setIsExpandedArm,
     );
   };
 
@@ -718,7 +968,7 @@ export function PoleStructuralAnalyzer() {
           FORM POLE (Bagian input section/Step Pole)
         ============================================================ */}
         <div
-          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-12 transition-all duration-500 ease-in-out ${
+          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-20 transition-all duration-500 ease-in-out ${
             isExpandedPole
               ? "rounded-t-2xl hp:rounded-t-xl"
               : "rounded-2xl hp:rounded-xl"
@@ -979,7 +1229,7 @@ export function PoleStructuralAnalyzer() {
           FORM DIRECT OBJECT (Bagian Direct Object perhitungan)
         ============================================================ */}
         <div
-          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-12 transition-all duration-500 ease-in-out ${
+          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-20 transition-all duration-500 ease-in-out ${
             isExpandedDo
               ? "rounded-t-2xl hp:rounded-t-xl"
               : "rounded-2xl hp:rounded-xl"
@@ -1031,7 +1281,7 @@ export function PoleStructuralAnalyzer() {
           FORM OVERHEAD WIRE (Bagian Overhead Wire perhitungan)
         ============================================================ */}
         <div
-          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-12 transition-all duration-500 ease-in-out ${
+          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-20 transition-all duration-500 ease-in-out ${
             isExpandedOhw
               ? "rounded-t-2xl hp:rounded-t-xl"
               : "rounded-2xl hp:rounded-xl"
@@ -1079,7 +1329,322 @@ export function PoleStructuralAnalyzer() {
           />
         </div>
 
-        <div className="flex justify-center items-center p-5 mt-6 mb-12 bg-gradient-to-b from-white to-slate-50 rounded-2xl border border-gray-200 shadow-sm relative hp:p-4 hp:rounded-xl">
+        {/* ============================================================
+          FORM ARM (Bagian input arm)
+        ============================================================ */}
+        <div
+          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-20 transition-all duration-500 ease-in-out ${
+            isExpandedArm
+              ? "rounded-t-2xl hp:rounded-t-xl"
+              : "rounded-2xl hp:rounded-xl"
+          } hp:px-4 hp:py-3`}
+          onClick={() => setIsExpandedArm(!isExpandedArm)}
+        >
+          {/* Judul cover */}
+          <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hp:px-2 hp:py-[8px]">
+            <h2
+              id="pole-section-title"
+              className="text-white text-sm font-bold hp:text-xs hp:font-semibold"
+            >
+              Arm and Object Specifications
+            </h2>
+          </div>
+
+          {/* Icon toggle (up/down) */}
+          <div className="p-2">
+            {isExpandedArm ? (
+              <ChevronUp className="w-5 h-5 text-white hp:w4 hp:h-4" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-white hp:w4 hp:h-4" />
+            )}
+          </div>
+        </div>
+
+        {/* Body form (collapsible) */}
+        <div
+          className={`transition-all duration-500 ease-in-out overflow-hidden ${
+            isExpandedArm
+              ? "max-h-[10000px] rounded-b-2xl hp:rounded-b-xl"
+              : "max-h-0 rounded-b-2xl hp:rounded-b-xl"
+          }`}
+        >
+          <div className="bg-white rounded-b-2xl shadow-sm border border-gray-200 hp:rounded-b-xl">
+            {/* Step Pole Form */}
+            <div className="px-6 pt-6 hp:p-4">
+              {/* HEADER ADD ARM */}
+              <div className="flex items-center justify-between mb-4 hp:items-start hp:flex-col hp:gap-6 hp:mb-6">
+                <div>
+                  <h2 className="text-[#0d3b66] text-sm flex items-center gap-1 hp:text-xs hp:flex hp:items-start">
+                    <div className="w-1 h-5 bg-[#3399cc] rounded-full mr-1 hp:h-4"></div>
+                    <span className="font-semibold">
+                      Configure up to 6 Arms
+                    </span>
+                    <span className=" font-medium hp:hidden">
+                      with detailed specifications
+                    </span>
+                  </h2>
+                </div>
+                {/* BUTTON ADD ARM */}
+                <button
+                  onClick={handleAddArm}
+                  disabled={arms.length >= 6}
+                  className={`flex items-center gap-2 text-sm px-7 py-3 rounded-lg font-medium transition-all shadow-md 
+                  ${
+                    arms.length >= 6
+                      ? "bg-gray-300 text-black opacity-40 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#0d3b66] to-[#3399cc] text-white hover:shadow-xl transition-transform duration-300 hover:scale-105"
+                  } hp:text-xs hp:px-[22px] hp:py-[10px] hp:self-center`}
+                >
+                  <Plus className="w-5 h-5 hp:w-4 hp:h-4" />
+                  Add Arm
+                </button>
+              </div>
+
+              {/* TABS SECTION */}
+              <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 hp:gap-2 hp:px-2 hp:justify-start scroll-smooth scrollbar-hide">
+                {arms.map((arm, index) => {
+                  const isCompleteArm = handleIsArmComplete(arm);
+                  const isActiveArm = activeTabArm === arm.idArm;
+
+                  return (
+                    <div key={arm.idArm} className="flex-shrink-0">
+                      <button
+                        onClick={() => setActiveTabArm(arm.idArm)}
+                        className={`
+                          flex items-center gap-3 px-7 py-2.5 rounded-lg border-2 transition-all
+                          ${
+                            isActiveArm
+                              ? "bg-blue-50 border-blue-500 text-blue-700 hover:bg-blue-100 shadow-md"
+                              : isCompleteArm
+                                ? "bg-green-50 border-green-500 text-green-700 hover:bg-green-100"
+                                : "bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
+                          }
+
+                          hp:px-4 hp:py-2
+                          
+                          hp:border
+                          hp:shadow-none
+                          hp:gap-2
+                        `}
+                      >
+                        {/* ICON */}
+                        {isCompleteArm ? (
+                          <CheckCircle className="w-5 h-5 hp:w-4 hp:h-4" />
+                        ) : (
+                          <Circle className="w-5 h-5 hp:w-4 hp:h-4" />
+                        )}
+
+                        {/* TEXT */}
+                        <span className="text-sm font-medium hp:text-xs">
+                          <span className="hidden hp:inline">{index + 1}</span>
+                          <span className="hp:hidden">
+                            {isActiveArm ? `Arm ${index + 1}` : index + 1}
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Divider */}
+              <div className="mt-5 border-t border-gray-200"></div>
+            </div>
+
+            {/* ACTIVE SECTION INPUT */}
+            {activeArm && (
+              <div className="p-6 hp:px-4 hp:pt-2 hp:pb-4">
+                <div className="space-y-6 hp:space-y-4">
+                  {/* Header section title */}
+                  <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-200 hp:mb-4 hp:pb-4">
+                    <div className="flex items-center gap-3 hp:gap-2">
+                      <div className="w-9 h-9 text-sm rounded-lg bg-gradient-to-br from-[#0d3b66] to-[#3399cc] flex items-center justify-center text-white hp:w-8 hp:h-8">
+                        {arms.findIndex((s) => s.idArm === activeTabArm) + 1}
+                      </div>
+                      <div>
+                        <h4 className="text-[#0d3b66] text-sm font-medium hp:text-xs">
+                          Arm
+                          {activeArm.nameArm && ` : ${activeArm.nameArm}`}
+                        </h4>
+                        {/* <p className="text-xs text-gray-500 hp:text-[10px]">
+                          {activeArm.armType} Type
+                        </p> */}
+                      </div>
+                    </div>
+
+                    {arms.length > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDeleteArm(activeArm.idArm);
+                        }}
+                        title="Delete Arm"
+                        className="
+                          flex items-center gap-2
+                          px-6 py-2.5
+                          rounded-lg
+                          border border-red-200
+                          text-red-600
+                          bg-red-50
+                          hover:bg-red-100 hover:border-red-300
+                          transition-all
+                          font-medium
+                          shadow-sm
+
+                          hp:px-[11px] hp:py-[8px]
+                        "
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="text-xs hp:hidden">Delete Arm</span>
+                      </button>
+                    )}
+                  </div>
+                  <ArmInput
+                    arm={activeArm}
+                    onUpdate={(updates) =>
+                      handleUpdateArm(activeTabArm, updates)
+                    }
+                    armError={armsErrors[activeTabArm] || {}}
+                  />
+                  {activeArm && (
+                    <ArmObjectInput
+                      armObjects={
+                        Array.isArray(activeArm.armObjects)
+                          ? activeArm.armObjects
+                          : []
+                      }
+                      aoInputValue={aoInputValue}
+                      setAoInputValue={setAoInputValue}
+                      onUpdate={handleUpdateAo}
+                      errors={aoErrors}
+                      onAddAo={handleAddAoByInput}
+                      onCopyAo={handleCopyAo}
+                      onPasteAo={handlePasteAo}
+                      hasClipboard={Boolean(aoClipboard)}
+                      setConfirmDeleteAo={setConfirmDeleteAo}
+                      resetCurrentAo={handleResetCurrentAo}
+                      handleAddAo={handleAddAo}
+                    />
+                  )}
+                </div>
+
+                {/* FOOTER: RESET + CALCULATE / NEXT */}
+                <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 hp:mt-5 hp:pt-4">
+                  {/* LEFT: RESET */}
+                  <button
+                    onClick={resetCurrentArm}
+                    className="flex items-center text-sm gap-2 px-7 py-2.5 bg-[#eef2f6] text-[#0d3b66]
+                    border-2 border-[#d0d7e2] rounded-lg hover:bg-[#e2e8f0] transition-colors font-medium hp:text-xs hp:px-[22px] hp:py-[8px]"
+                  >
+                    <RotateCcw className="w-5 h-5 hp:w-4 hp:h-4" />
+                    Reset
+                  </button>
+
+                  {/* RIGHT: CALCULATE / NEXT ARM */}
+                  <div className="flex items-center gap-3 hp:gap-2">
+                    {/* BACK BUTTON */}
+                    {arms.findIndex((s) => s.idArm === activeTabArm) > 0 && (
+                      <button
+                        onClick={() => {
+                          const currentIndex = arms.findIndex(
+                            (s) => s.idArm === activeTabArm,
+                          );
+                          setActiveTabArm(arms[currentIndex - 1].idArm);
+                        }}
+                        className="flex items-center text-sm gap-2 px-7 py-2.5 bg-[#eef2f6] text-[#0d3b66]
+                        border-2 border-[#d0d7e2] rounded-lg hover:bg-[#e2e8f0] transition-colors font-medium hp:text-xs hp:px-[10px] hp:py-[8px] hp:border-none"
+                      >
+                        <ChevronLeft className="w-5 h-5 hp:w-4 hp:h-4" />
+                        <span className="hp:hidden">Back</span>
+                      </button>
+                    )}
+
+                    {/* CALCULATE / NEXT BUTTON */}
+                    <div className="relative">
+                      {/* CONDITIONAL BUTTON */}
+                      {isOnlyArm || isLastArm ? (
+                        <button
+                          onClick={handleStepNext}
+                          className="flex items-center text-sm gap-2 px-7 py-2.5 bg-gradient-to-r
+                          from-[#0d3b66] to-[#3399cc] text-white rounded-lg hover:brightness-110
+                          transition-all font-medium shadow-md hp:text-xs hp:px-[22px] hp:py-[8px]"
+                        >
+                          Next Input
+                          <ChevronDown className="w-5 h-5 hp:w-4 hp:h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleNextArm}
+                          className="flex items-center text-sm gap-2 px-7 py-2.5
+                          bg-gradient-to-r from-[#0d3b66] to-[#3399cc]
+                          text-white rounded-lg  
+                          hover:brightness-110 transition-all shadow-md font-medium hp:text-xs hp:px-[22px] hp:py-[8px]"
+                        >
+                          Next Step
+                          <ChevronRight className="w-5 h-5 hp:w-4 hp:h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ============================================================
+          FORM ARM OBJECT (Bagian Arm Object perhitungan)
+        ============================================================ */}
+        <div
+          className={`bg-gradient-to-r from-[#0d3b66] to-[#3399cc] p-4 flex items-center justify-between cursor-pointer mt-20 transition-all duration-500 ease-in-out ${
+            isExpandedAo
+              ? "rounded-t-2xl hp:rounded-t-xl"
+              : "rounded-2xl hp:rounded-xl"
+          } hp:px-4 hp:py-3`}
+          onClick={() => setIsExpandedAo(!isExpandedAo)}
+        >
+          {/* Judul cover */}
+          <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hp:px-2 hp:py-[8px]">
+            <h2 className="text-white text-sm font-bold hp:text-xs hp:font-semibold">
+              Arm & Object Specifications
+            </h2>
+          </div>
+
+          {/* Icon toggle (up/down) */}
+          <div className="p-2">
+            {isExpandedAo ? (
+              <ChevronUp className="w-5 h-5 text-white hp:w4 hp:h-4" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-white hp:w4 hp:h-4" />
+            )}
+          </div>
+        </div>
+
+        {/* Body form (collapsible) */}
+        <div
+          className={`transition-all duration-500 ease-in-out overflow-hidden ${
+            isExpandedAo
+              ? "max-h-[10000px] rounded-b-2xl hp:rounded-b-xl"
+              : "max-h-0 rounded-b-2xl hp:rounded-b-xl"
+          }`}
+        >
+          <ArmObjectInput
+            armObjects={armObjects}
+            aoInputValue={aoInputValue}
+            setAoInputValue={setAoInputValue}
+            onUpdate={handleUpdateAo}
+            errors={aoErrors}
+            onAddAo={handleAddAoByInput}
+            onCopyAo={handleCopyAo}
+            onPasteAo={handlePasteAo}
+            hasClipboard={Boolean(aoClipboard)}
+            setConfirmDeleteAo={setConfirmDeleteAo}
+            resetCurrentAo={handleResetCurrentAo}
+            handleAddAo={handleAddAo}
+          />
+        </div>
+
+        <div className="flex justify-center items-center p-5 mt-12 mb-20 bg-gradient-to-b from-white to-slate-50 rounded-2xl border border-gray-200 shadow-sm relative hp:p-4 hp:rounded-xl">
           <button
             onClick={calculateResults}
             className="
@@ -1160,18 +1725,39 @@ export function PoleStructuralAnalyzer() {
         confirmReduceDirectObjects={confirmReduceDirectObjects}
       />
 
-      {/* Delete Confirmation Modal for Direct Object */}
+      {/* Delete Confirmation Modal for Overhead Wire */}
       <Modal.ConfirmDeleteOhwModal
         confirmDelete={confirmDeleteOhw}
         onClose={() => setConfirmDeleteOhw(false)}
         handleRemoveOhw={() => handleRemoveOhw(confirmDeleteOhw)}
       />
 
-      {/* Delete Confirmation Modal for Direct Object */}
+      {/* Delete Confirmation Modal for Overhead Wire */}
       <Modal.ConfirmReduceOhwModal
         confirmReduceOhw={confirmReduceOhw}
         cancelReduceOverheadWires={cancelReduceOverheadWires}
         confirmReduceOverheadWires={confirmReduceOverheadWires}
+      />
+
+      {/* Delete Confirmation Modal for Arm */}
+      <Modal.ConfirmDeleteArmModal
+        confirmDeleteArm={confirmDeleteArm}
+        onClose={() => setConfirmDeleteArm(false)}
+        handleRemoveArm={() => handleRemoveArm(confirmDeleteArm)}
+      />
+
+      {/* Delete Confirmation Modal for Arm Object */}
+      <Modal.ConfirmDeleteAoModal
+        confirmDelete={confirmDeleteAo}
+        onClose={() => setConfirmDeleteAo(false)}
+        handleRemoveAo={() => handleRemoveAo(confirmDeleteAo)}
+      />
+
+      {/* Delete Confirmation Modal for Arm Object */}
+      <Modal.ConfirmReduceAoModal
+        confirmReduceAo={confirmReduceAo}
+        cancelReduceArmObjects={cancelReduceArmObjects}
+        confirmReduceArmObjects={confirmReduceArmObjects}
       />
     </div>
   );

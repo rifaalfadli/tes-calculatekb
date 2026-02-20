@@ -198,3 +198,73 @@ export function calculateOhwResults(overheadWires) {
     };
   });
 }
+
+// ==============================
+// ARM INPUT
+// ==============================
+export function calculateArmResults(arms) {
+  return arms.map((arm, index) => {
+    const nameArm = arm.nameArm || `アーム-${index + 1}`;
+    const materialArm = arm.materialArm;
+
+    const diameterArm = parseFloat(arm.diameterArm) || 0;
+    const thicknessArm = parseFloat(arm.thicknessArm) || 0;
+    const lengthArm = parseFloat(arm.lengthArm) || 0;
+    const expLengthArm = parseFloat(arm.expLengthArm) || 0;
+    const heightArm = parseFloat(arm.heightArm) || 0;
+
+    return {
+      armNum: `AO${index + 1}`,
+      nameArm,
+      materialArm,
+      diameterArm,
+      thicknessArm,
+      lengthArm,
+      expLengthArm,
+      heightArm,
+    };
+  });
+}
+
+// ==============================
+// ARM OBJECT INPUT
+// ==============================
+export function calculateAoResults(armObjects) {
+  return armObjects.map((armObject, index) => {
+    const nameAo = armObject.nameAo;
+    const typeOfAo = armObject.typeOfAo;
+
+    const frontAreaAo = parseFloat(armObject.frontAreaAo) || 0;
+    const sideAreaAo = parseFloat(armObject.sideAreaAo) || 0;
+    const weightAo = parseFloat(armObject.weightAo) || 0;
+    const heightAo = parseFloat(armObject.heightAo) || 0;
+    const fixAngleAo = parseFloat(armObject.fixAngleAo) || 0;
+    const nncAo = parseFloat(armObject.nncAo) || 0;
+    const qtyAo = parseFloat(armObject.qtyAo) || 1;
+
+    // dummy data
+    const flAo = 100;
+    const cfAo = 1;
+    const wlafAo = 100;
+    const wlasAo = 100;
+    const slAo = 100;
+
+    return {
+      aoNum: `AO${index + 1}`,
+      nameAo,
+      typeOfAo,
+      frontAreaAo,
+      sideAreaAo,
+      weightAo,
+      heightAo,
+      fixAngleAo,
+      nncAo,
+      qtyAo,
+      flAo,
+      cfAo,
+      wlafAo,
+      wlasAo,
+      slAo,
+    };
+  });
+}

@@ -316,3 +316,150 @@ export const clearOhwError = (idOhw, updates, setOhwErrors) => {
     return next;
   });
 };
+
+// ====================================================
+// Function for Arm Input
+// ====================================================
+// FUNCTION: Check if a arm is complete
+export const isArmComplete = (arm) => {
+  if (
+    arm.nameArm.trim() === "" ||
+    arm.diameterArm.trim() === "" ||
+    arm.thicknessArm.trim() === "" ||
+    arm.lengthArm.trim() === "" ||
+    arm.expLengthArm.trim() === "" ||
+    arm.heightArm.trim() === "" ||
+    arm.materialArm.trim() === ""
+  ) {
+    return false;
+  }
+
+  return true;
+};
+// FUNCTION: Create an error checker helper for the arm
+export const getArmsErrors = (arms) => {
+  const allErrors = {};
+
+  arms.forEach((arm) => {
+    const e = {
+      nameArm: isEmpty(arm.nameArm),
+      diameterArm: isEmpty(arm.diameterArm),
+      thicknessArm: isEmpty(arm.thicknessArm),
+      lengthArm: isEmpty(arm.lengthArm),
+      expLengthArm: isEmpty(arm.expLengthArm),
+      heightArm: isEmpty(arm.heightArm),
+      materialArm: isEmpty(arm.materialArm),
+    };
+
+    if (Object.values(e).some(Boolean)) {
+      allErrors[arm.idArm] = e;
+    }
+  });
+
+  return allErrors;
+};
+
+// FUNCTION: clear error for a specific arm
+export const clearArmError = (armId, updates, setArmsErrors) => {
+  setArmsErrors((prev) => {
+    const next = { ...prev };
+    const armError = { ...(next[armId] || {}) };
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value && value.toString().trim() !== "") {
+        armError[key] = false;
+      }
+    });
+
+    // kalau semua error false, hapus object error arm
+    const hasError = Object.values(armError).some(Boolean);
+    if (hasError) {
+      next[armId] = armError;
+    } else {
+      delete next[armId];
+    }
+
+    return next;
+  });
+};
+
+// ====================================================
+// Function for Arm Object Input
+// ====================================================
+// FUNCTION: Check if a arm object is complete
+export const isAoComplete = (armObject) => {
+  // field wajib untuk all type
+  const baseComplete =
+    armObject.nameAo.trim() !== "" &&
+    armObject.frontAreaAo.trim() !== "" &&
+    armObject.weightAo.trim() !== "" &&
+    armObject.heightAo.trim() !== "" &&
+    armObject.nncAo.trim() !== "" &&
+    armObject.qtyAo.trim() !== "";
+
+  if (!baseComplete) return false;
+
+  // tambahan khusus directional
+  if (armObject.typeOfAo === "directional") {
+    return (
+      armObject.sideAreaAo.trim() !== "" && armObject.fixAngleAo.trim() !== ""
+    );
+  }
+
+  return true;
+};
+
+// FUNCTION: Create an error checker helper for the arm object
+export const getAoErrors = (arms) => {
+  const allErrors = {};
+
+  arms.forEach((arm) => {
+    arm.armObjects?.forEach((ao) => {
+      const e = {
+        nameAo: isEmpty(ao.nameAo),
+        frontAreaAo: isEmpty(ao.frontAreaAo),
+        weightAo: isEmpty(ao.weightAo),
+        heightAo: isEmpty(ao.heightAo),
+        nncAo: isEmpty(ao.nncAo),
+        qtyAo: isEmpty(ao.qtyAo),
+        sideAreaAo: false,
+        fixAngleAo: false,
+      };
+
+      if (ao.typeOfAo === "directional") {
+        e.sideAreaAo = isEmpty(ao.sideAreaAo);
+        e.fixAngleAo = isEmpty(ao.fixAngleAo);
+      }
+
+      if (Object.values(e).some(Boolean)) {
+        allErrors[ao.idAo] = e;
+      }
+    });
+  });
+
+  return allErrors;
+};
+
+// FUNCTION: clear error for a specific arm object
+export const clearAoError = (idAo, updates, setAoErrors) => {
+  setAoErrors((prev) => {
+    const next = { ...prev };
+    const aoError = { ...(next[idAo] || {}) };
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value && value.toString().trim() !== "") {
+        aoError[key] = false;
+      }
+    });
+
+    // kalau semua error false => hapus object error AO
+    const hasError = Object.values(aoError).some(Boolean);
+    if (hasError) {
+      next[idAo] = aoError;
+    } else {
+      delete next[idAo];
+    }
+
+    return next;
+  });
+};

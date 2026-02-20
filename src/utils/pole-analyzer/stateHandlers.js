@@ -391,3 +391,209 @@ export const resetCurrentOhw = (setOverheadWires, overheadWires, idOhw) => {
     ),
   );
 };
+
+// ====================================================
+// Function for Arm Input
+// ====================================================
+// FUNCTION: Add a new arm (max 6 arm)
+export const addArm = (arms, setArms, setActiveTabArm, armIdRef) => {
+  if (arms.length >= 6) return;
+
+  armIdRef.current += 1;
+  const newId = armIdRef.current.toString();
+
+  setArms([
+    ...arms,
+    {
+      idArm: newId,
+      nameArm: "",
+      diameterArm: "",
+      thicknessArm: "",
+      lengthArm: "",
+      expLengthArm: "",
+      heightArm: "",
+      materialArm: "STK400",
+
+      armObjects: [],
+    },
+  ]);
+
+  setActiveTabArm(newId); // set newly added arm as active
+};
+
+// FUNCTION: Remove a arm by ID
+export const removeArm = (idArm, setArms, activeTabArm, setActiveTabArm) => {
+  setArms((prevArms) => {
+    const index = prevArms.findIndex((s) => s.idArm === idArm);
+    if (index === -1) return prevArms;
+
+    const newArms = prevArms.filter((s) => s.idArm !== idArm);
+
+    // pindah tab kalau yang aktif dihapus
+    if (activeTabArm === idArm) {
+      if (newArms.length > 0) {
+        const newIndex = index > 0 ? index - 1 : 0;
+        setActiveTabArm(newArms[newIndex].idArm);
+      } else {
+        setActiveTabArm("");
+      }
+    }
+
+    return newArms;
+  });
+};
+
+// FUNCTION: Update a specific arm's data
+export const updateArm = (idArm, updates, setArms, arms) => {
+  setArms(arms.map((s) => (s.idArm === idArm ? { ...s, ...updates } : s)));
+};
+
+// FUNCTION: Reset the active arm to default values
+export const resetCurrentArm = (setArms, arms, activeTabArm) => {
+  setArms(
+    arms.map((s) =>
+      s.idArm === activeTabArm
+        ? {
+            ...s,
+            nameArm: "",
+            diameterArm: "",
+            thicknessArm: "",
+            lengthArm: "",
+            expLengthArm: "",
+            heightArm: "",
+            materialArm: "STK400",
+          }
+        : s,
+    ),
+  );
+};
+
+// ====================================================
+// Function for Arm Object Input
+// ====================================================
+// FUNCTION: Add a new arm object (max 5 object) By Input
+export const syncAoByInput = (
+  inputValue,
+  armObjects,
+  updateActiveArmObjects,
+  aoIdRef,
+  onConfirmReduce,
+) => {
+  const target = Math.min(Number(inputValue), 5);
+  if (!target || target < 0) return;
+
+  const current = armObjects.length;
+
+  if (target === current) return;
+
+  if (target > current) {
+    const addCount = target - current;
+
+    const newItems = Array.from({ length: addCount }, () => {
+      aoIdRef.current += 1;
+
+      return {
+        idAo: aoIdRef.current.toString(),
+        nameAo: "",
+        typeOfAo: "omni",
+        frontAreaAo: "",
+        sideAreaAo: "",
+        weightAo: "",
+        heightAo: "",
+        fixAngleAo: "",
+        nncAo: "",
+        qtyAo: "1",
+      };
+    });
+
+    updateActiveArmObjects([...armObjects, ...newItems]);
+    return;
+  }
+
+  onConfirmReduce({ from: current, to: target });
+};
+
+// FUNCTION: Add a new arm object (max 5 object) By Click
+export const addAo = (armObjects, updateActiveArmObjects, aoIdRef) => {
+  if (armObjects.length >= 5) return;
+
+  aoIdRef.current += 1;
+
+  updateActiveArmObjects([
+    ...armObjects,
+    {
+      idAo: aoIdRef.current.toString(),
+      nameAo: "",
+      typeOfAo: "omni",
+      frontAreaAo: "",
+      sideAreaAo: "",
+      weightAo: "",
+      heightAo: "",
+      fixAngleAo: "",
+      nncAo: "",
+      qtyAo: "1",
+    },
+  ]);
+};
+
+// FUNCTION: Copy Arm Object data to clipboard
+export const copyAo = (armObject, setAoClipboard) => {
+  setAoClipboard({
+    nameAo: armObject.nameAo,
+    typeOfAo: armObject.typeOfAo,
+    frontAreaAo: armObject.frontAreaAo,
+    sideAreaAo: armObject.sideAreaAo,
+    weightAo: armObject.weightAo,
+    heightAo: armObject.heightAo,
+    fixAngleAo: armObject.fixAngleAo,
+    nncAo: armObject.nncAo,
+    qtyAo: armObject.qtyAo,
+  });
+};
+
+// FUNCTION: Paste clipboard data into a specific Arm Object
+export const pasteAo = (
+  idAo,
+  armObjects,
+  updateActiveArmObjects,
+  clipboard,
+) => {
+  if (!clipboard) return;
+
+  updateActiveArmObjects(
+    armObjects.map((o) => (o.idAo === idAo ? { ...o, ...clipboard } : o)),
+  );
+};
+
+// FUNCTION: Remove a Arm object by ID
+export const removeAo = (idAo, armObjects, updateActiveArmObjects) => {
+  updateActiveArmObjects(armObjects.filter((o) => o.idAo !== idAo));
+};
+
+// FUNCTION: Update a specific object's data
+export const updateAo = (idAo, updates, armObjects, updateActiveArmObjects) => {
+  updateActiveArmObjects(
+    armObjects.map((o) => (o.idAo === idAo ? { ...o, ...updates } : o)),
+  );
+};
+
+// FUNCTION: Reset the active arm object to default values
+export const resetCurrentAo = (idAo, armObjects, updateActiveArmObjects) => {
+  updateActiveArmObjects(
+    armObjects.map((o) =>
+      o.idAo === idAo
+        ? {
+            ...o,
+            nameAo: "",
+            frontAreaAo: "",
+            sideAreaAo: "",
+            weightAo: "",
+            heightAo: "",
+            fixAngleAo: "",
+            nncAo: "",
+            qtyAo: "1",
+          }
+        : o,
+    ),
+  );
+};

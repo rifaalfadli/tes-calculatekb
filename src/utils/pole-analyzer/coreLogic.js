@@ -3,6 +3,8 @@ import {
   structuralDesignResults,
   calculateDoResults,
   calculateOhwResults,
+  calculateAoResults,
+  calculateArmResults,
 } from "./calculationResults";
 
 // ===============================================================================
@@ -19,10 +21,15 @@ export const handleCalculateResults = (
   handleIsDoComplete,
   overheadWires,
   handleIsOhwComplete,
+  arms,
+  handleIsArmComplete,
+  handleIsAoComplete,
   setResults,
   setResultStructuralDesign,
   setResultsDo,
   setResultsOhw,
+  setResultsArm,
+  setResultsAo,
   setShowResults,
 ) => {
   const errors = {
@@ -31,6 +38,8 @@ export const handleCalculateResults = (
     section: false,
     directObject: false,
     overheadWire: false,
+    arm: false,
+    armObject: false,
   };
 
   // VALIDATION: condition information
@@ -46,7 +55,7 @@ export const handleCalculateResults = (
   }
 
   // VALIDATION: each section/step pole
-  for (let section of sections) {
+  for (const section of sections || []) {
     if (!handleIsSectionComplete(section)) {
       showToast("Please complete all Pole Specification fields.");
       errors.section = true;
@@ -72,6 +81,30 @@ export const handleCalculateResults = (
     }
   }
 
+  // VALIDATION: each arm
+  for (let arm of arms) {
+    if (!handleIsArmComplete(arm)) {
+      showToast("Please complete all Arm Specification fields.");
+      errors.arm = true;
+      break;
+    }
+  }
+
+  // VALIDATION: each arm object (nested)
+  for (const arm of arms || []) {
+    if (!arm) continue;
+
+    for (const armObject of arm.armObjects || []) {
+      if (!handleIsAoComplete(armObject)) {
+        showToast("Please complete all Arm Object fields.");
+        errors.armObject = true;
+        break;
+      }
+    }
+
+    if (errors.armObject) break;
+  }
+
   const isValid = Object.values(errors).every((v) => v === false);
 
   // STOP kalau tidak valid
@@ -84,11 +117,15 @@ export const handleCalculateResults = (
   const calculatedResultsDo = calculateDoResults(directObjects);
   const calculatedStructuralDesign = structuralDesignResults(structuralDesign);
   const calculatedResultsOhw = calculateOhwResults(overheadWires);
+  const calculatedResultsArm = calculateArmResults(arms);
+  const calculatedResultsAo = calculateAoResults(arms);
 
   setResults(calculatedResults);
   setResultStructuralDesign(calculatedStructuralDesign);
   setResultsDo(calculatedResultsDo);
   setResultsOhw(calculatedResultsOhw);
+  setResultsArm(calculatedResultsArm);
+  setResultsAo(calculatedResultsAo);
   setShowResults(true);
 
   // ALL CHECK PASSED
@@ -106,10 +143,13 @@ export const makeReport = (
   structuralDesignComplete,
   sections,
   handleIsSectionComplete,
+  arms,
+  handleIsArmComplete,
   directObjects,
   handleIsDoComplete,
   overheadWires,
   handleIsOhwComplete,
+  handleIsAoComplete,
 ) => {
   const errors = {
     results: false,
@@ -119,10 +159,12 @@ export const makeReport = (
     section: false,
     directObject: false,
     overheadWire: false,
+    arm: false,
+    armObject: false,
   };
 
   // CHECK 1: Results
-  if (results.length === 0) {
+  if (!results || results.length === 0) {
     showToast("No calculation results pole available.");
     errors.results = true;
   }
@@ -172,6 +214,29 @@ export const makeReport = (
     }
   }
 
+  // CHECK 9: Arms
+  for (let arm of arms) {
+    if (!handleIsArmComplete(arm)) {
+      showToast("Please complete all Arm Specification first.");
+      errors.arm = true;
+      break;
+    }
+  }
+
+  // CHECK 10: Arm Object
+  for (const arm of arms || []) {
+    if (!arm) continue;
+
+    for (const armObject of arm.armObjects || []) {
+      if (!handleIsAoComplete(armObject)) {
+        showToast("Please complete all Arm Object first.");
+        errors.armObject = true;
+        break;
+      }
+    }
+
+    if (errors.armObject) break;
+  }
   const isValid = Object.values(errors).every((v) => v === false);
 
   return { isValid, errors };
@@ -185,6 +250,8 @@ export const deleteReport = (
   setResultsDo,
   setResultsOhw,
   setResultStructuralDesign,
+  setResultsArm,
+  setResultsAo,
   setShowResults,
   setCover,
   setCondition,
@@ -192,20 +259,25 @@ export const deleteReport = (
   setSections,
   setDirectObjects,
   setOverheadWires,
+  setArms,
   setActiveTab,
   setIsExpandedCondition,
   setIsExpandedPole,
   sectionIdRef,
   doIdRef,
   ohwIdRef,
+  armIdRef,
   setIsExpandedDo,
   setIsExpandedOhw,
+  setIsExpandedArm,
 ) => {
   // Hapus hasil kalkulasi
   setResults([]);
   setResultsDo([]);
   setResultsOhw([]);
   setResultStructuralDesign([]);
+  setResultsArm([]);
+  setResultsAo([]);
   setShowResults(false);
 
   // Reset Cover
@@ -255,6 +327,10 @@ export const deleteReport = (
   setOverheadWires([]);
   ohwIdRef.current = 0;
 
+  // Reset Arm
+  setArms([]);
+  armIdRef.current = 0;
+
   // Reset active tab ke section 1
   setActiveTab("1");
   sectionIdRef.current = 1;
@@ -264,6 +340,7 @@ export const deleteReport = (
   setIsExpandedPole(true);
   setIsExpandedDo(false);
   setIsExpandedOhw(false);
+  setIsExpandedArm(false);
 
   // Hapus semua sessionStorage
   // sessionStorage.clear();
@@ -273,7 +350,11 @@ export const deleteReport = (
   sessionStorage.removeItem("sections");
   sessionStorage.removeItem("directObjects");
   sessionStorage.removeItem("overheadWires");
+  sessionStorage.removeItem("arms");
+  sessionStorage.removeItem("armObjects");
   sessionStorage.removeItem("results");
   sessionStorage.removeItem("resultsDo");
   sessionStorage.removeItem("resultsOhw");
+  sessionStorage.removeItem("resultsArm");
+  sessionStorage.removeItem("resultsAo");
 };

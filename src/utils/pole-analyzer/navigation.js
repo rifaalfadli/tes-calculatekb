@@ -29,3 +29,14 @@ export const stepPoleNext = (setIsExpandedPole, setIsExpandedDo) => {
   // Open direct Object
   setIsExpandedDo(true);
 };
+
+// ====================================================
+// Function for Arm Input
+// ====================================================
+// FUNCTION: Go to the next arm tab
+export const goToNextArm = (arms, activeTabArm, setActiveTabArm) => {
+  const currentIndex = arms.findIndex((s) => s.idArm === activeTabArm);
+  if (currentIndex < arms.length - 1) {
+    setActiveTabArm(arms[currentIndex + 1].idArm);
+  }
+};

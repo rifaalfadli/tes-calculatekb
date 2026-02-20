@@ -1,15 +1,16 @@
 import React, { useRef, useMemo, useState, useLayoutEffect } from "react";
-import { createBlocks } from "./LightingPoleBlock";
-import { paginateA4LightingPole } from "../hooks/useReportPagination";
-import LightingPolePages from "./LightingPolePages";
+import { createBlocks } from "./SignboardBlock";
+import { paginateA4Signboard } from "../hooks/useReportPagination";
+import SignboardPages from "./SignboardPages";
 import "../../../styles/page.css";
 
-export default function LightingPoleReport({
+export default function SignboardReport({
   cover,
   condition,
   structuralDesign,
   results,
   resultsDo,
+  resultsOhw,
 }) {
   // 1. blocks memo
   const blocks = useMemo(
@@ -29,7 +30,7 @@ export default function LightingPoleReport({
 
     // Tunggu font siap agar pengukuran offsetHeight akurat
     document.fonts.ready.then(() => {
-      const paginatedPages = paginateA4LightingPole({
+      const paginatedPages = paginateA4Signboard({
         blocks,
         measureRef,
       });
@@ -37,10 +38,10 @@ export default function LightingPoleReport({
     });
   }, [blocks]);
 
-  // 5. FASE 1 — measurement ONLY (user TIDAK LIHAT)
+  // 5. Fase 1 - measurement only
   if (!pages) {
     return (
-      <div ref={measureRef} className="measure-container">
+      <div ref={measureRef} className="measure-container-sb">
         {blocks.map((b) => (
           <div key={b.id} data-id={b.id} className="measure-block">
             {b.node}
@@ -50,9 +51,9 @@ export default function LightingPoleReport({
     );
   }
 
-  // 6. FASE 2 — FINAL RENDER (HANYA SEKALI)
+  // 6. Fase 2 - final render
   return (
-    <LightingPolePages
+    <SignboardPages
       cover={cover}
       condition={condition}
       results={results}
